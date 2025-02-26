@@ -3,9 +3,9 @@
 kube-eye 前端服务器，提供静态文件服务和 kube-eye 报表 pdf。
 
 ## TODO:
-- [ ] 静态文件服务器
+- [x] 静态文件服务器
 - [ ] typst 集成，提供报表接口
-   - [ ] ks api-server 地址配置文件
+   - [x] ks api-server 地址配置文件
    - [ ] typst 模版
    - [ ] 接口查询
    - [ ] typst 内容生产
