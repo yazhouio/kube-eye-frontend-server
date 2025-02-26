@@ -1,6 +1,6 @@
 # kube-eye-frontend-server
 
-kube-eye 前端服务器
+kube-eye 前端服务器，提供静态文件服务和 kube-eye 报表 pdf。
 
 ## TODO:
 - [ ] 静态文件服务器
