@@ -7,7 +7,7 @@ kube-eye 前端服务器
 
 
 
-kinks: 
+links: 
  - [typst as lib](https://crates.io/crates/typst-as-lib)
  - [axum](https://github.com/tokio-rs/axum/blob/main/examples/static-file-server/src/main.rs)
  - [构建](https://docker.github.net.cn/language/rust/)
