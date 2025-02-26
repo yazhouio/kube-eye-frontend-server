@@ -5,6 +5,11 @@ kube-eye 前端服务器
 ## TODO:
 - [ ] 静态文件服务器
 - [ ] typst 集成，提供报表接口
+   - [ ] ks api-server 地址配置文件
+   - [ ] typst 模版
+   - [ ] 接口查询
+   - [ ] typst 内容生产
+   - [ ] 输出 pdf 流 
 - [ ] docker 构建
 - [ ] github action 集成
 
