@@ -1,3 +1,6 @@
+use std::io::Cursor;
+
+use axum::body::Body;
 use axum::http::{HeaderMap, HeaderValue};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -7,18 +10,22 @@ use axum_extra::{
     TypedHeader,
     headers::{Authorization, authorization::Bearer},
 };
+use bytes::Bytes;
 use reqwest::StatusCode;
 use reqwest::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use serde::Deserialize;
 use snafu::ResultExt;
 use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 use tokio_util::io::ReaderStream;
 use tower_http::services::ServeDir;
 use tracing::info;
 
+use crate::api;
 use crate::config::ServerConfig;
-use crate::error::{BindSnafu, FileOpenSnafu, Result, ServeSnafu};
+use crate::error::{BindSnafu, FileIoSnafu, Result, ServeSnafu};
+use crate::typst_lib::{generate_pdf, generate_pdf_new};
 
 pub struct Server {
     pub config: ServerConfig,
@@ -42,13 +49,18 @@ pub async fn report(
         CONTENT_DISPOSITION,
         HeaderValue::from_static("attachment; filename=\"Report.pdf\""),
     );
-    // 生成文件流
-    let file = File::open("assets/Report.pdf")
-        .await
-        .context(FileOpenSnafu)?;
-    let stream = ReaderStream::new(file);
-    let file_stream_resp = FileStream::new(stream).file_name("Report.pdf");
-    Ok((resp_header, file_stream_resp).into_response())
+    let content = api::query_report();
+    let pdf: Vec<u8> = generate_pdf_new(content)?;
+    // pdf to file
+    // let mut file = File::options()
+    //     .create(true)
+    //     .write(true)
+    //     .open("./Report.pdf")
+    //     .await
+    //     .context(FileIoSnafu)?;
+    // file.write_all(&pdf).await.context(FileIoSnafu)?;
+    let body = Body::from(pdf);
+    Ok((resp_header, body).into_response())
 }
 
 impl Server {

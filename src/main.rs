@@ -15,7 +15,7 @@ mod typst_lib;
 
 #[main]
 async fn main() -> Result<()> {
-    color_eyre::install().context(ColorEyreInstallSnafu)?;
+    // color_eyre::install().context(ColorEyreInstallSnafu)?;
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {

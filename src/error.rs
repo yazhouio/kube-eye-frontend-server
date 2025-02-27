@@ -3,6 +3,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use snafu::Snafu;
+use tracing::error;
+use typst_as_lib::TypstAsLibError;
 
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
@@ -72,8 +74,8 @@ pub enum Error {
         #[snafu(implicit)]
         loc: snafu::Location,
     },
-    #[snafu(display("{}: Failed to open file: {:#?}\n {:#?}\n", loc, source, backtrace))]
-    FileOpen {
+    #[snafu(display("{}: Failed to file io: {:#?}\n {:#?}\n", loc, source, backtrace))]
+    FileIo {
         #[snafu(source)]
         source: std::io::Error,
         #[snafu(backtrace)]
@@ -81,6 +83,17 @@ pub enum Error {
         #[snafu(implicit)]
         loc: snafu::Location,
     },
+    #[snafu(display("{}: Failed to compile typst: {:#?}\n {:#?}\n", loc, source, backtrace))]
+    TypstCompile {
+        #[snafu(source)]
+        source: TypstAsLibError,
+        #[snafu(backtrace)]
+        backtrace: snafu::Backtrace,
+        #[snafu(implicit)]
+        loc: snafu::Location,
+    },
+    #[snafu(display("Failed to generate pdf:{}", message))]
+    TypstPdf { message: String },
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
@@ -88,9 +101,10 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let body = match self {
-            Error::FileOpen { .. } => "Failed to open file",
+            Error::FileIo { .. } => "Failed to file io",
             _ => "Server Error",
         };
+        error!("{}", self);
         (StatusCode::INTERNAL_SERVER_ERROR, body).into_response()
     }
 }
