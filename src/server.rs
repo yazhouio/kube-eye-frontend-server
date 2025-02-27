@@ -25,7 +25,7 @@ use tracing::info;
 use crate::api;
 use crate::config::ServerConfig;
 use crate::error::{BindSnafu, FileIoSnafu, Result, ServeSnafu};
-use crate::typst_lib::{generate_pdf, generate_pdf_new};
+use crate::typst_lib::generate_pdf_new;
 
 pub struct Server {
     pub config: ServerConfig,
