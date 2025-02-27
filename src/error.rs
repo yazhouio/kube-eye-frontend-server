@@ -4,7 +4,6 @@ use axum::{
 };
 use snafu::Snafu;
 use tracing::error;
-use typst_as_lib::TypstAsLibError;
 
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
@@ -78,15 +77,6 @@ pub enum Error {
     FileIo {
         #[snafu(source)]
         source: std::io::Error,
-        #[snafu(backtrace)]
-        backtrace: snafu::Backtrace,
-        #[snafu(implicit)]
-        loc: snafu::Location,
-    },
-    #[snafu(display("{}: Failed to compile typst: {:#?}\n {:#?}\n", loc, source, backtrace))]
-    TypstCompile {
-        #[snafu(source)]
-        source: TypstAsLibError,
         #[snafu(backtrace)]
         backtrace: snafu::Backtrace,
         #[snafu(implicit)]
