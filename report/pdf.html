@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Svg Document</title>
-    <script type="module" src="./all-in-one-lite.bundle.js" id="typst"></script>
+    <script type="module" src="./vendors/all-in-one-lite.bundle.js" id="typst"></script>
   </head>
   <body>
     <script>
@@ -44,10 +44,10 @@
                 { assets: false },
               ),
             ],
-            getModule: () => './typst_ts_web_compiler_bg.wasm',
+            getModule: () => './vendors/typst_ts_web_compiler_bg.wasm',
           });
           $typst.setRendererInitOptions({
-            getModule: () => './typst_ts_renderer_bg.wasm',
+            getModule: () => './vendors/typst_ts_renderer_bg.wasm',
           });
 
           const compile = function (mainContent, fileName) {
