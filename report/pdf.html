@@ -1,30 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Svg Document</title>
-    <script type="module" src="./vendors/all-in-one-lite.bundle.js" id="typst"></script>
+    <script
+      type="module"
+      src="./vendors/all-in-one-lite.bundle.js"
+      id="typst"
+    ></script>
   </head>
   <body>
     <script>
       (() => {
-        let content = '';
+        let content = "";
         const getId = () => {
           const url = new URL(window.location.href);
-          const typId = url.searchParams.get('typ');
-          const callback = url.searchParams.get('cb');
-          return { typId, callback };
+          const typId = url.searchParams.get("typ");
+          return { typId };
         };
-        const { typId, callback } = getId();
-        if (!typId || !callback) {
-          console.error('typId or callback is not found');
+        const { typId } = getId();
+        if (!typId) {
+          console.error("typId is not found");
           return;
         }
         const randomId = Math.random().toString(36).substring(2, 15);
         const postMessageId = `typst-${randomId}`;
 
-        document.getElementById('typst').addEventListener('load', function () {
+        document.getElementById("typst").addEventListener("load", function () {
           function preloadRemoteFonts(userFonts, options) {
             const fonts = [...userFonts];
             const loader = async (_, { ref, builder }) => {
@@ -40,41 +43,43 @@
           $typst.setCompilerInitOptions({
             beforeBuild: [
               preloadRemoteFonts(
-                ['./fonts/NotoSerifSC-Regular.ttf', './fonts/NotoSansSC-Regular.ttf'],
-                { assets: false },
+                [
+                  "./fonts/NotoSerifSC-Regular.ttf",
+                  "./fonts/NotoSansSC-Regular.ttf",
+                ],
+                { assets: false }
               ),
             ],
-            getModule: () => './vendors/typst_ts_web_compiler_bg.wasm',
+            getModule: () => "./vendors/typst_ts_web_compiler_bg.wasm",
           });
           $typst.setRendererInitOptions({
-            getModule: () => './vendors/typst_ts_renderer_bg.wasm',
+            getModule: () => "./vendors/typst_ts_renderer_bg.wasm",
           });
 
           const compile = function (mainContent, fileName) {
-            $typst.pdf({ mainContent }).then(pdf => {
-              const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
+            $typst.pdf({ mainContent }).then((pdf) => {
+              const pdfBlob = new Blob([pdf], { type: "application/pdf" });
               const pdfUrl = URL.createObjectURL(pdfBlob);
-              const a = document.createElement('a');
+              const a = document.createElement("a");
               a.href = pdfUrl;
               a.download = fileName;
               a.click();
             });
           };
 
-          window.addEventListener('message', e => {
+          window.addEventListener("message", (e) => {
             if (e.data.type === postMessageId) {
               compile(e.data.content, e.data.file_name);
             }
           });
-          console.log(randomId, typId, postMessageId, callback);
           window.parent.postMessage(
             {
-              type: callback,
+              type: typId,
               content: {
                 cb: postMessageId,
               },
             },
-            '*',
+            "*"
           );
         });
       })();
