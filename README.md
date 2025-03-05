@@ -23,7 +23,7 @@
    - [x] ~~输出 pdf 流 ~~
 - [ ] ~~docker 构建~~
 - [ ] ~~github action 集成~~
-- [ ] 使用 typst.ts 在前端界面实现 pdf 导出
+- [x] 使用 typst.ts 在前端界面实现 pdf 导出
 
 
 
