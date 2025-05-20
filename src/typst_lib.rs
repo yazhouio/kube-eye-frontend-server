@@ -3,11 +3,10 @@ use typst::{Document, layout::PagedDocument, syntax::Source};
 use typst_as_library::TypstWrapperWorld;
 use typst_pdf::PdfOptions;
 
-use crate::{api, error::{Error, Result, TypstPdfSnafu}};
+use crate::{ error::{Error, Result, TypstPdfSnafu}};
 static ROOT: &str = "./assets/templates";
 
 pub fn generate_pdf_new(content: String) -> Result<Vec<u8>> {
-    let content = api::query_report();
     let world = TypstWrapperWorld::new("./assets".to_owned(), content.to_owned());
     let pdf = typst::compile(&world)
         .output

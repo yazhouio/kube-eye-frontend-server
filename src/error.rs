@@ -1,7 +1,7 @@
 use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
+    extract::rejection::JsonRejection, http::StatusCode, response::{IntoResponse, Response}, Json
 };
+use serde_json::Value;
 use snafu::Snafu;
 use tracing::error;
 
@@ -84,9 +84,34 @@ pub enum Error {
     },
     #[snafu(display("Failed to generate pdf:{}", message))]
     TypstPdf { message: String },
+
+      #[snafu(display("Invalid input: {reason}"))]
+    InvalidInput {
+        reason: String,
+    },
+
+    #[snafu(display("Bad request: {message}"))]
+    BadRequest { message: String },
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
+
+#[derive(serde::Serialize)]
+struct ErrorResponse {
+    code: String,
+    message: String,
+}
+
+
+impl From<JsonRejection> for Error {
+    fn from(rejection: JsonRejection) -> Self {
+        tracing::debug!("JsonRejection: {:?}", rejection);
+        Error::BadRequest {
+            message: format!("JSON parse error: {}", rejection.body_text()),
+        }
+    }
+}
+
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
@@ -95,6 +120,10 @@ impl IntoResponse for Error {
             _ => "Server Error",
         };
         error!("{}", self);
-        (StatusCode::INTERNAL_SERVER_ERROR, body).into_response()
+        let json = Json(ErrorResponse{
+            code:StatusCode::INTERNAL_SERVER_ERROR.to_string(),
+            message: body.to_string(),
+        });
+        (StatusCode::INTERNAL_SERVER_ERROR, json).into_response()
     }
 }

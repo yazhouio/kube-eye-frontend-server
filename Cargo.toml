@@ -4,21 +4,21 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tokio-util = { version = "0.7.13" }
-axum = "0.8.1"
-axum-extra = { version = "0.10.0", features = ["typed-header", "file-stream"] }
-bytes = "1.10.0"
-color-eyre = "0.6.3"
+tokio-util = { version = "0.7.15" }
+axum = "0.8.4"
+axum-extra = { version = "0.10.1", features = ["typed-header", "file-stream"] }
+bytes = "1.10.1"
+color-eyre = "0.6.4"
 figment = { version = "0.10.19", features = ["env", "toml"] }
-reqwest = "0.12.12"
-serde = { version = "1.0.218", features = ["derive"] }
-serde_json = "1.0.139"
+reqwest = "0.12.15"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 snafu = { version = "0.8.5" }
-tokio = { version = "1.43.0", features = ["full"] }
+tokio = { version = "1.45.0", features = ["full"] }
 tower = "0.5.2"
-tower-http = { version = "0.6.2", features = ["fs"] }
+tower-http = { version = "0.6.4", features = ["fs"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
-typst = "0.13.0"
-typst-pdf = "0.13.0"
+typst = "0.13.1"
+typst-pdf = "0.13.1"
 typst-as-library = { git = "https://github.com/tfachmann/typst-as-library.git", branch = "main"}

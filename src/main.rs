@@ -7,7 +7,6 @@ use tokio::main;
 use tracing::error;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod api;
 mod config;
 mod error;
 mod server;
@@ -15,7 +14,7 @@ mod typst_lib;
 
 #[main]
 async fn main() -> Result<()> {
-    // color_eyre::install().context(ColorEyreInstallSnafu)?;
+    color_eyre::install().context(ColorEyreInstallSnafu)?;
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
