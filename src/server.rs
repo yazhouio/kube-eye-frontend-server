@@ -1,15 +1,8 @@
 use std::sync::Arc;
 
 use axum::{
-    Router,
-    body::Body,
-    extract::State,
-    http::{HeaderMap, HeaderValue},
-    middleware,
-    response::IntoResponse,
-    routing::{get, post},
+    body::Body, extract::State, http::{header::{CONTENT_DISPOSITION, CONTENT_TYPE}, HeaderMap, HeaderValue}, middleware, response::IntoResponse, routing::{get, post}, Router
 };
-use reqwest::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use serde::Deserialize;
 use snafu::ResultExt;
 use tokio::net::TcpListener;
