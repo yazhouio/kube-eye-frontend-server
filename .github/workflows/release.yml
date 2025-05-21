@@ -32,12 +32,12 @@ jobs:
         run: |
           cross build --release --target ${{ matrix.target }}
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/app dist/app-${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/kube-eye-export-server dist/kube-eye-export-server-${{ matrix.target }}
 
       - name: Upload Linux binaries to release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/app-${{ matrix.target }}
+          files: dist/kube-eye-export-server-${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,12 +62,12 @@ jobs:
         run: |
           cargo build --release --target aarch64-apple-darwin
           mkdir -p dist
-          cp target/aarch64-apple-darwin/release/kube-eye-export-server dist/app-aarch64-apple-darwin
+          cp target/aarch64-apple-darwin/release/kube-eye-export-server dist/kube-eye-export-server-aarch64-apple-darwin
 
       - name: Upload macOS binary to release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/app-aarch64-apple-darwin
+          files: dist/kube-eye-export-server-aarch64-apple-darwin
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
