@@ -39,7 +39,7 @@ jobs:
         with:
           files: dist/kube-eye-export-server-${{ matrix.target }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
   build-macos:
     name: Build for macOS M1
