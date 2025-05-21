@@ -20,40 +20,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install OpenSSL dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
       - name: Install cross
         uses: taiki-e/install-action@cross
 
       - name: Build with cross
         run: |
           cross build --release --target ${{ matrix.target }}
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/app dist/app-${{ matrix.target }}
 
-      - name: Upload Linux binaries
+      - name: Upload Linux binaries to release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            target/${{ matrix.target }}/release/app
+          files: dist/app-${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     name: Build for macOS M1
-    runs-on: macos-13  # Intel mac 可以构建 macOS M1 二进制
+    runs-on: macos-13
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install OpenSSL (macOS)
+        run: |
+          brew install pkg-config openssl@3
+
+      - name: Set OPENSSL_DIR
+        run: echo "OPENSSL_DIR=$(brew --prefix openssl@3)" >> $GITHUB_ENV
+
       - name: Install Rust target
         run: rustup target add aarch64-apple-darwin
 
-      - name: Build for aarch64-apple-darwin
+      - name: Build for macOS M1
         run: |
           cargo build --release --target aarch64-apple-darwin
+          mkdir -p dist
+          cp target/aarch64-apple-darwin/release/kube-eye-export-server dist/app-aarch64-apple-darwin
 
-      - name: Upload macOS M1 binary
+      - name: Upload macOS binary to release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            target/aarch64-apple-darwin/release/app
+          files: dist/app-aarch64-apple-darwin
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
@@ -84,4 +98,4 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kube-eye-export-server:${{ github.ref_name }}
+          tags: spike2044/kube-eye-export-server:${{ github.ref_name }}
