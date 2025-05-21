@@ -1,7 +1,3 @@
-[ks_api]
-host = "localhost"
-port = 8080
-
 [server]
 public_dir_dist = [["dist/v4", "/dist/cmft-frontend"], ["dist/v3", "/extensions-static/cmft-frontend/dist/v3dist"]]
 host = "localhost"
