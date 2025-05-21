@@ -55,7 +55,7 @@ jobs:
           files: |
             target/aarch64-apple-darwin/release/app
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
   docker:
     name: Build and Push Docker Image
@@ -84,4 +84,4 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: spike2044/kube-eye-export-server:${{ github.ref_name }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kube-eye-export-server:${{ github.ref_name }}
