@@ -1,4 +1,4 @@
-use crate::error::Result;
+use color_eyre::eyre::Result;
 use config::Config;
 use error::{ColorEyreInstallSnafu, FigmentParseSnafu};
 use figment::{Figment, providers::Format};
@@ -7,8 +7,10 @@ use tokio::main;
 use tracing::error;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod auth;
 mod config;
 mod error;
+mod extractor;
 mod server;
 mod typst_lib;
 
@@ -18,7 +20,11 @@ async fn main() -> Result<()> {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!("{}=debug,tower_http=debug,axum=trace", env!("CARGO_CRATE_NAME")).into()
+                format!(
+                    "{}=debug,tower_http=debug,axum=trace",
+                    env!("CARGO_CRATE_NAME")
+                )
+                .into()
             }),
         )
         .with(tracing_subscriber::fmt::layer())
@@ -32,12 +38,12 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-pub async fn run() -> Result<()> {
+pub async fn run() -> error::Result<()> {
     let config: Config = Figment::new()
         .merge(figment::providers::Toml::file("Config.toml"))
         .merge(figment::providers::Env::prefixed("APP_"))
         .extract()
         .context(FigmentParseSnafu {})?;
     let server = server::Server::new(config.server);
-    server.run().await
+    server.run(config.typst).await
 }

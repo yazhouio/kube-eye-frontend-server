@@ -1,7 +1,10 @@
 use axum::{
-    extract::rejection::JsonRejection, http::StatusCode, response::{IntoResponse, Response}, Json
+    extract::rejection::JsonRejection,
+    http::StatusCode,
+    response::{IntoResponse, Response},
 };
-use serde_json::Value;
+use color_eyre::eyre::Report;
+use serde::Serialize;
 use snafu::Snafu;
 use tracing::error;
 
@@ -85,23 +88,36 @@ pub enum Error {
     #[snafu(display("Failed to generate pdf:{}", message))]
     TypstPdf { message: String },
 
-      #[snafu(display("Invalid input: {reason}"))]
-    InvalidInput {
-        reason: String,
-    },
+    #[snafu(display("Invalid input: {reason}"))]
+    InvalidInput { reason: String },
 
     #[snafu(display("Bad request: {message}"))]
     BadRequest { message: String },
+
+    #[snafu(display("Missing Authorization"))]
+    MissingAuth,
+
+    #[snafu(display("Invalid Token"))]
+    InvalidToken,
+
+    #[snafu(display("Invalid Json Body. {}", source))]
+    InvalidJsonBody {
+        source: axum::extract::rejection::JsonRejection,
+        #[snafu(implicit)]
+        loc: snafu::Location,
+    },
+
+    #[snafu(display("Internal Error: {}", source))]
+    Internal { source: Report },
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-#[derive(serde::Serialize)]
+#[derive(Serialize)]
 struct ErrorResponse {
-    code: String,
+    code: u32,
     message: String,
 }
-
 
 impl From<JsonRejection> for Error {
     fn from(rejection: JsonRejection) -> Self {
@@ -112,18 +128,37 @@ impl From<JsonRejection> for Error {
     }
 }
 
+impl From<color_eyre::Report> for Error {
+    fn from(source: Report) -> Self {
+        Error::Internal { source }
+    }
+}
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
-        let body = match self {
-            Error::FileIo { .. } => "Failed to file io",
-            _ => "Server Error",
+        error!("❌ API Error: {:#?}", self);
+        let (status, code, message) = match self {
+            Error::MissingAuth => (StatusCode::UNAUTHORIZED, 1001, self.to_string()),
+            Error::InvalidToken => (StatusCode::UNAUTHORIZED, 1003, self.to_string()),
+            Error::InvalidJsonBody { .. } => {
+                (StatusCode::UNPROCESSABLE_ENTITY, 1005, self.to_string())
+            }
+            // Error::TypstPdf { message } => {
+            //     (StatusCode::INTERNAL_SERVER_ERROR, 5000, self.to_string())
+            // }
+            // Error::Internal { .. } => (
+            //     StatusCode::INTERNAL_SERVER_ERROR,
+            //     5000,
+            //     "内部错误".to_string(),
+            // ),
+            // Error::FileIo { .. } => (
+            //     StatusCode::INTERNAL_SERVER_ERROR,
+            //     5000,
+            //     "内部错误".to_string(),
+            // ),
+            _ => (StatusCode::INTERNAL_SERVER_ERROR, 5000, self.to_string()),
         };
-        error!("{}", self);
-        let json = Json(ErrorResponse{
-            code:StatusCode::INTERNAL_SERVER_ERROR.to_string(),
-            message: body.to_string(),
-        });
-        (StatusCode::INTERNAL_SERVER_ERROR, json).into_response()
+        let body = axum::Json(ErrorResponse { code, message });
+        (status, body).into_response()
     }
 }
