@@ -73,9 +73,10 @@ impl Server {
                 "/api",
                 Router::new()
                     .route("/report", post(report))
-                    .with_state(typst_config),
+                    .with_state(typst_config)
+                    .layer(middleware::from_fn(auth::simple_token_auth)),
             )
-            .layer(middleware::from_fn(auth::simple_token_auth));
+            ;
         let app = router.into_make_service();
         axum::serve(listener, app).await.context(ServeSnafu)?;
         Ok(())
