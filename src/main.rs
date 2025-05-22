@@ -21,7 +21,7 @@ async fn main() -> Result<()> {
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
                 format!(
-                    "{}=debug,tower_http=debug,axum=trace",
+                    "{}=debug,tower_http=debug,axum::rejection=trace",
                     env!("CARGO_CRATE_NAME")
                 )
                 .into()
@@ -40,7 +40,9 @@ async fn main() -> Result<()> {
 
 pub async fn run() -> error::Result<()> {
     let config: Config = Figment::new()
-        .merge(figment::providers::Toml::file("/etc/kube-eye-export-server/Config.toml"))
+        .merge(figment::providers::Toml::file(
+            "/etc/kube-eye-export-server/Config.toml",
+        ))
         .merge(figment::providers::Toml::file("./Config.toml"))
         .merge(figment::providers::Env::prefixed("APP_"))
         .extract()

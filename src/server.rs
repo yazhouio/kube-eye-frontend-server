@@ -1,12 +1,21 @@
 use std::sync::Arc;
 
 use axum::{
-    body::Body, extract::State, http::{header::{CONTENT_DISPOSITION, CONTENT_TYPE}, HeaderMap, HeaderValue}, middleware, response::IntoResponse, routing::{get, post}, Router
+    Router,
+    body::Body,
+    extract::State,
+    http::{
+        HeaderMap, HeaderValue,
+        header::{CONTENT_DISPOSITION, CONTENT_TYPE},
+    },
+    middleware,
+    response::IntoResponse,
+    routing::{get, post},
 };
 use serde::Deserialize;
 use snafu::ResultExt;
 use tokio::net::TcpListener;
-use tower_http::services::ServeDir;
+use tower_http::{services::ServeDir, trace::TraceLayer};
 use tracing::info;
 
 use crate::{
@@ -68,6 +77,8 @@ impl Server {
         let router = Router::new();
         let router = self
             .public_dir_dist(router)
+            .layer(TraceLayer::new_for_http())
+            .route("/", get(|| async { "ok" }))
             .route("/version", get(|| async { "0.1.0" }))
             .route("/health", get(|| async { "ok" }))
             .nest(
@@ -75,9 +86,9 @@ impl Server {
                 Router::new()
                     .route("/report", post(report))
                     .with_state(typst_config)
-                    .layer(middleware::from_fn(auth::simple_token_auth)),
-            )
-            ;
+                    .layer(middleware::from_fn(auth::simple_token_auth))
+                    .layer(TraceLayer::new_for_http()),
+            );
         let app = router.into_make_service();
         axum::serve(listener, app).await.context(ServeSnafu)?;
         Ok(())
