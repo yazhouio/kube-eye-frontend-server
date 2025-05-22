@@ -1393,6 +1393,7 @@ dependencies = [
  "color-eyre",
  "figment",
  "openssl",
+ "percent-encoding",
  "serde",
  "serde_json",
  "snafu",

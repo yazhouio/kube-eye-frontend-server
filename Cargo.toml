@@ -22,3 +22,4 @@ typst = "0.13.1"
 typst-pdf = "0.13.1"
 typst-as-library = { git = "https://github.com/tfachmann/typst-as-library.git", branch = "main"}
 openssl = { version = "0.10", features = ["vendored"] }
+percent-encoding = "2.3.1"

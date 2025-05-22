@@ -12,6 +12,7 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
+use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 use serde::Deserialize;
 use snafu::ResultExt;
 use tokio::net::TcpListener;
@@ -44,7 +45,14 @@ pub async fn report(
 ) -> Result<impl IntoResponse> {
     let mut resp_header = HeaderMap::new();
     resp_header.insert(CONTENT_TYPE, HeaderValue::from_static("application/pdf"));
-    let disposition = format!("attachment; filename=\"{}.pdf\"", payload.name);
+    let encoded_filename = utf8_percent_encode(&payload.name, NON_ALPHANUMERIC).to_string();
+    let fallback_filename = "export";
+    let disposition = format!(
+        "attachment; filename=\"{fallback}{ext}\"; filename*=UTF-8''{encoded}{ext}",
+        fallback = fallback_filename,
+        ext = ".pdf",
+        encoded = encoded_filename
+    );
     resp_header.insert(
         CONTENT_DISPOSITION,
         HeaderValue::from_str(&disposition).unwrap(),
