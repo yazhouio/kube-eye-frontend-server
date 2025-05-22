@@ -69,6 +69,7 @@ impl Server {
         let router = self
             .public_dir_dist(router)
             .route("/version", get(|| async { "0.1.0" }))
+            .route("/health", get(|| async { "ok" }))
             .nest(
                 "/api",
                 Router::new()
