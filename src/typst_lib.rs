@@ -40,13 +40,13 @@ pub fn generate_pdf(content: String, config: &TypstConfig, theme: &str) -> Resul
     let mut templates: Vec<(String, String)> = theme
         .themplates
         .iter()
-        .filter_map(|template| {
-            let path = theme_path.join(&template.1);
+        .filter_map(|(template_name, template_path)| {
+            let path = theme_path.join(template_path);
             let Ok(temp) = std::fs::read_to_string(&path) else {
-                tracing::debug!("Failed to read template: {}, path: {:?}", template.0, &path);
+                tracing::debug!("Failed to read template: {}, path: {:?}", template_name, &path);
                 return None;
             };
-            Some((template.0.clone(), temp))
+            Some((template_name.to_owned(), temp))
         })
         .collect();
     templates.push(("main.typ".to_string(), content));
