@@ -2960,6 +2960,7 @@ dependencies = [
  "ecow",
  "thiserror 2.0.12",
  "typst",
+ "typst-kit",
 ]
 
 [[package]]
@@ -2999,6 +3000,23 @@ dependencies = [
  "typst-library",
  "typst-macros",
  "typst-svg",
+ "typst-syntax",
+ "typst-timing",
+ "typst-utils",
+]
+
+[[package]]
+name = "typst-kit"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "818fa9d54e1663fe20d15f6359945616cc4026d68c4de6c4eb0add7556fe2a90"
+dependencies = [
+ "ecow",
+ "fontdb",
+ "once_cell",
+ "serde",
+ "serde_json",
+ "typst-library",
  "typst-syntax",
  "typst-timing",
  "typst-utils",
