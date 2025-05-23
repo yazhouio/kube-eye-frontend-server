@@ -1,4 +1,4 @@
-name: Rust Release and Docker Image
+name: Release
 
 on:
   push:
