@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use snafu::OptionExt;
-use typst_as_lib::TypstEngine;
+use typst_as_lib::{typst_kit_options::TypstKitFontOptions, TypstEngine};
 
 use crate::{
     config::{Theme, TypstConfig},
@@ -43,7 +43,11 @@ pub fn generate_pdf(content: String, config: &TypstConfig, theme: &str) -> Resul
         .filter_map(|(template_name, template_path)| {
             let path = theme_path.join(template_path);
             let Ok(temp) = std::fs::read_to_string(&path) else {
-                tracing::debug!("Failed to read template: {}, path: {:?}", template_name, &path);
+                tracing::debug!(
+                    "Failed to read template: {}, path: {:?}",
+                    template_name,
+                    &path
+                );
                 return None;
             };
             Some((template_name.to_owned(), temp))
@@ -56,6 +60,7 @@ pub fn generate_pdf(content: String, config: &TypstConfig, theme: &str) -> Resul
         .collect::<Vec<(&str, &str)>>();
 
     let engine = TypstEngine::builder()
+        .search_fonts_with(TypstKitFontOptions::default().include_system_fonts(true))
         .fonts(fonts)
         .with_static_source_file_resolver(templates)
         .build();
