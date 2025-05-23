@@ -24,7 +24,7 @@ use crate::{
     config::{ServerConfig, TypstConfig},
     error::{BindSnafu, Result, ServeSnafu},
     extractor::ValidatedJson,
-    typst_lib::generate_pdf_new,
+    typst_lib::generate_pdf,
 };
 
 pub struct Server {
@@ -35,7 +35,7 @@ pub struct Server {
 pub struct ReportRequest {
     pub name: String,
     pub content: String,
-    // pub report_id: String,
+    pub theme: String,
 }
 
 #[tracing::instrument(name = "report", skip(payload))]
@@ -57,9 +57,8 @@ pub async fn report(
         CONTENT_DISPOSITION,
         HeaderValue::from_str(&disposition).unwrap(),
     );
-    let assets_dir = state.assets_dir.as_str();
     let content = payload.content;
-    let pdf: Vec<u8> = generate_pdf_new(content, assets_dir)?;
+    let pdf: Vec<u8> = generate_pdf(content, state.as_ref(), payload.theme.as_str())?;
     let body = Body::from(pdf);
     Ok((resp_header, body).into_response())
 }

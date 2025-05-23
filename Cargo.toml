@@ -20,6 +20,7 @@ tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 typst = "0.13.1"
 typst-pdf = "0.13.1"
-typst-as-library = { git = "https://github.com/tfachmann/typst-as-library.git", branch = "main"}
+# typst-as-library = { git = "https://github.com/tfachmann/typst-as-library.git", branch = "main"}
 openssl = { version = "0.10", features = ["vendored"] }
 percent-encoding = "2.3.1"
+typst-as-lib = "0.14.3"

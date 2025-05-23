@@ -1,7 +1,15 @@
 [server]
-public_dir_dist = [["dist/v4", "/dist/cmft-frontend"], ["dist/v3", "/extensions-static/cmft-frontend/dist/v3dist"]]
+public_dir_dist = [["dist/v4", "/dist/cmft-frontend"]]
 host = "localhost"
 port = 8080
 
 [typst]
-assets_dir = "assets"
+assets_dir = "/root/code/kube-eye-frontend-server/assets"
+
+[typst.icons]
+Noto_Serif_SC = "fonts/NotoSansSC-Regular.ttf"
+Noto_Sans_SC = "fonts/NotoSerifSC-Regular.ttf"
+
+[typst.themes.default]
+icons = ["Noto_Serif_SC", "Noto_Sans_SC"]
+themplates = { "template.typ" = "template/template.typ" }
