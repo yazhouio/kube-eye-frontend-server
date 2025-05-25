@@ -24,3 +24,11 @@ typst-pdf = "0.13.1"
 openssl = { version = "0.10", features = ["vendored"] }
 percent-encoding = "2.3.1"
 typst-as-lib = { version = "0.14.3", features = ["typst-kit-fonts"] }
+
+[profile.release]
+opt-level = "s"   # 最小体积优化
+lto = true        # 启用链接时优化
+panic = "abort"   # 移除 panic 信息
+strip = true      # 移除符号信息
+debug = false     # 禁用调试信息
+codegen-units = 1 # 减少编译单元数量
