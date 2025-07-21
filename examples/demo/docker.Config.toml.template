@@ -1,0 +1,15 @@
+[server]
+public_dir_dist = [["./dist", "/dist/kubeeye"], ["./v3dist", "/extensions-static/kubeeye/dist/v3dist"]]
+host = "0.0.0.0"
+port = 80
+
+[typst]
+assets_dir = "./assets"
+
+[typst.icons]
+Noto_Serif_SC = "fonts/NotoSansSC-Regular.ttf"
+Noto_Sans_SC = "fonts/NotoSerifSC-Regular.ttf"
+
+[typst.themes.default]
+icons = ["Noto_Serif_SC", "Noto_Sans_SC"]
+themplates = {}
