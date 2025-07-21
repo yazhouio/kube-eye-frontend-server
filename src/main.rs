@@ -43,7 +43,7 @@ pub async fn run() -> error::Result<()> {
         .merge(figment::providers::Toml::file(
             "/etc/kube-eye-export-server/Config.toml",
         ))
-        .merge(figment::providers::Toml::file("./Config.toml"))
+        .merge(figment::providers::Toml::file("Config.toml"))
         .merge(figment::providers::Env::prefixed("APP_"))
         .extract()
         .context(FigmentParseSnafu)?;

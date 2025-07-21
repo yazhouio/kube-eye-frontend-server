@@ -27,5 +27,7 @@ target/
 /dist
 
 /config.toml
-/Config.toml
+/**/Config.toml
 */.DS_Store
+.DS_Store
+.idea

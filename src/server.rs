@@ -35,7 +35,7 @@ pub struct Server {
 pub struct ReportRequest {
     pub name: String,
     pub content: String,
-    pub theme: String,
+    pub theme: Option<String>,
 }
 
 #[tracing::instrument(name = "report", skip(payload))]
@@ -58,7 +58,11 @@ pub async fn report(
         HeaderValue::from_str(&disposition).unwrap(),
     );
     let content = payload.content;
-    let pdf: Vec<u8> = generate_pdf(content, state.as_ref(), payload.theme.as_str())?;
+    let pdf: Vec<u8> = generate_pdf(
+        content,
+        state.as_ref(),
+        payload.theme.unwrap_or("default".to_string()).as_str(),
+    )?;
     let body = Body::from(pdf);
     Ok((resp_header, body).into_response())
 }

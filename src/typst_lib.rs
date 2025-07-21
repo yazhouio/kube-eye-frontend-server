@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use snafu::OptionExt;
-use typst_as_lib::{typst_kit_options::TypstKitFontOptions, TypstEngine};
+use typst_as_lib::{TypstEngine, typst_kit_options::TypstKitFontOptions};
 
 use crate::{
     config::{Theme, TypstConfig},
