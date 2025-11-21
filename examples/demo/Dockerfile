@@ -1,4 +1,4 @@
-FROM spike2044/kube-eye-export-server:v0.1.1
+FROM spike2044/kube-eye-export-server:v0.1.2
 
 WORKDIR /app
 COPY ./dist ./dist
