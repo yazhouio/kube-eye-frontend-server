@@ -3,9 +3,8 @@ use std::{
     sync::Arc,
 };
 
-use crate::server;
 use arc_swap::ArcSwap;
-use figment::Figment;
+use figment::{Figment, providers::Format};
 use notify::{Watcher, recommended_watcher};
 use snafu::ResultExt;
 use tokio::sync::mpsc;
@@ -14,6 +13,7 @@ use crate::{
     client_config::ClientConfig,
     config::Config,
     error::{self, FigmentParseSnafu, WatchFileSnafu},
+    server,
 };
 
 async fn load_server_config() -> error::Result<Config> {
