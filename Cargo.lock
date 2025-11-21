@@ -1444,7 +1444,7 @@ dependencies = [
 
 [[package]]
 name = "kube-eye-export-server"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "arc-swap",
  "axum",

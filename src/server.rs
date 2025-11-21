@@ -114,7 +114,13 @@ impl Server {
             .public_dir_dist(Router::new())
             .layer(TraceLayer::new_for_http())
             .route("/", get(|| async { "ok" }))
-            .route("/version", get(|| async { "0.1.0" }))
+            .route(
+                "/version",
+                get(|| async {
+                    let version = env!("CARGO_PKG_VERSION");
+                    format!("version: {}", version)
+                }),
+            )
             .route("/health", get(|| async { "ok" }))
             .nest(
                 "/api",
