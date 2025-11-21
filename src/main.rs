@@ -1,21 +1,10 @@
-use color_eyre::eyre::Result;
-use config::Config;
-use error::{ColorEyreInstallSnafu, FigmentParseSnafu};
-use figment::{Figment, providers::Format};
+use kube_eye_export_server::{error::ColorEyreInstallSnafu, run};
 use snafu::ResultExt;
-use tokio::main;
 use tracing::error;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod auth;
-mod config;
-mod error;
-mod extractor;
-mod server;
-mod typst_lib;
-
-#[main]
-async fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> color_eyre::eyre::Result<()> {
     color_eyre::install().context(ColorEyreInstallSnafu)?;
     tracing_subscriber::registry()
         .with(
@@ -36,17 +25,4 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
-}
-
-pub async fn run() -> error::Result<()> {
-    let config: Config = Figment::new()
-        .merge(figment::providers::Toml::file(
-            "/etc/kube-eye-export-server/Config.toml",
-        ))
-        .merge(figment::providers::Toml::file("Config.toml"))
-        .merge(figment::providers::Env::prefixed("APP_"))
-        .extract()
-        .context(FigmentParseSnafu)?;
-    let server = server::Server::new(config.server);
-    server.run(config.typst).await
 }

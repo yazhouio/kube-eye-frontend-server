@@ -1,6 +1,6 @@
 [package]
 name = "kube-eye-export-server"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2024"
 
 [dependencies]
@@ -9,8 +9,8 @@ axum = "0.8.4"
 axum-extra = { version = "0.10.1", features = ["typed-header", "file-stream"] }
 bytes = "1.10.1"
 color-eyre = "0.6.4"
-figment = { version = "0.10.19", features = ["env", "toml"] }
-serde = { version = "1", features = ["derive"] }
+figment = { version = "0.10.19", features = ["env", "toml", "yaml"] }
+serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 snafu = { version = "0.8.5" }
 tokio = { version = "1.45.0", features = ["full"] }
@@ -23,6 +23,8 @@ typst-pdf = "0.13.1"
 # typst-as-library = { git = "https://github.com/tfachmann/typst-as-library.git", branch = "main"}
 percent-encoding = "2.3.1"
 typst-as-lib = { version = "0.14.3", features = ["typst-kit-fonts"] }
+notify = "8.2.0"
+arc-swap = "1.7.1"
 
 [profile.release]
 opt-level = "s"   # 最小体积优化

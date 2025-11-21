@@ -39,16 +39,14 @@ pub enum Error {
         loc: snafu::Location,
     },
     #[snafu(display(
-        "{}: Failed to parse figment config: {:#?}\n {:#?}\n",
+        "{}: Failed to parse figment config: {}\n {:#?}\n",
         loc,
         source,
-        backtrace
+        source,
     ))]
     FigmentParse {
         #[snafu(source)]
         source: figment::Error,
-        #[snafu(backtrace)]
-        backtrace: snafu::Backtrace,
         #[snafu(implicit)]
         loc: snafu::Location,
     },
@@ -109,6 +107,12 @@ pub enum Error {
 
     #[snafu(display("Internal Error: {}", source))]
     Internal { source: Report },
+
+    WatchFile {
+        source: notify::Error,
+        #[snafu(implicit)]
+        loc: snafu::Location,
+    },
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
