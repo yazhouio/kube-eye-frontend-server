@@ -39,8 +39,9 @@ pub enum Error {
         loc: snafu::Location,
     },
     #[snafu(display(
-        "{}: Failed to parse figment config: {:#?}\n {:#?}\n",
+        "{}: Failed to parse figment config: {}\n {:#?}\n {:#?}\n",
         loc,
+        source,
         source,
         backtrace
     ))]

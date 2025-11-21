@@ -31,3 +31,5 @@ target/
 */.DS_Store
 .DS_Store
 .idea
+client_config.yaml
+local_client_config.yaml
