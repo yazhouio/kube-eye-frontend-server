@@ -1,11 +1,14 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
+use crate::server;
 use arc_swap::ArcSwap;
-use figment::{Figment, providers::Format};
+use figment::Figment;
 use notify::{Watcher, recommended_watcher};
 use snafu::ResultExt;
 use tokio::sync::mpsc;
-use crate::server;
 
 use crate::{
     client_config::ClientConfig,
@@ -26,12 +29,24 @@ async fn load_server_config() -> error::Result<Config> {
 }
 
 pub async fn load_client_config() -> error::Result<ClientConfig> {
-    let config: ClientConfig = Figment::new()
-        .merge(figment::providers::Yaml::file("client_config.yaml"))
-        .merge(figment::providers::Yaml::file("local_client_config.yaml"))
+    let config: ClientConfig = client_config_figment()
         .extract()
         .context(FigmentParseSnafu)?;
     Ok(config)
+}
+
+fn client_config_figment() -> Figment {
+    let mut figment = Figment::new();
+
+    if Path::new("client_config.yaml").exists() {
+        figment = figment.merge(figment::providers::Yaml::file("client_config.yaml"));
+    }
+
+    if Path::new("local_client_config.yaml").exists() {
+        figment = figment.merge(figment::providers::Yaml::file("local_client_config.yaml"));
+    }
+
+    figment
 }
 
 pub async fn run() -> error::Result<()> {
@@ -63,16 +78,21 @@ pub async fn spawn_config_watcher(
         .context(WatchFileSnafu)?;
 
         for path in &path {
-            watcher
-                .watch(path.as_path(), notify::RecursiveMode::Recursive)
-                .context(WatchFileSnafu)?;
+            if path.exists() {
+                watcher
+                    .watch(path.as_path(), notify::RecursiveMode::NonRecursive)
+                    .context(WatchFileSnafu)?;
+            } else {
+                tracing::warn!(
+                    "skip watching missing client config file: {}",
+                    path.display()
+                );
+            }
         }
 
         while let Some(event) = rx.recv().await {
             tracing::info!("event: {:#?}", event);
-            Figment::new()
-                .merge(figment::providers::Yaml::file("client_config.yaml"))
-                .merge(figment::providers::Yaml::file("local_client_config.yaml"))
+            client_config_figment()
                 .extract()
                 .context(FigmentParseSnafu)
                 .map_or_else(

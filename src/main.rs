@@ -2,10 +2,7 @@ use snafu::ResultExt;
 use tracing::error;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use kube_eye_export_server::{
-    error::ColorEyreInstallSnafu,
-    run,
-};
+use kube_eye_export_server::{error::ColorEyreInstallSnafu, run};
 
 #[tokio::main]
 async fn main() -> color_eyre::eyre::Result<()> {
