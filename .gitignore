@@ -26,9 +26,10 @@ target/
 
 /dist
 
-/Config.toml
 */.DS_Store
 .DS_Store
 .idea
-/client_config.yaml
-/local_client_config.yaml
+/configs/Config.toml
+/configs/client_config.yaml
+/configs/local_client_config.yaml
+AGENTS.md

@@ -21,7 +21,7 @@ async fn load_server_config() -> error::Result<Config> {
         .merge(figment::providers::Toml::file(
             "/etc/kube-eye-export-server/Config.toml",
         ))
-        .merge(figment::providers::Toml::file("Config.toml"))
+        .merge(figment::providers::Toml::file("configs/Config.toml"))
         .merge(figment::providers::Env::prefixed("APP_"))
         .extract()
         .context(FigmentParseSnafu)?;
@@ -36,17 +36,11 @@ pub async fn load_client_config() -> error::Result<ClientConfig> {
 }
 
 fn client_config_figment() -> Figment {
-    let mut figment = Figment::new();
-
-    if Path::new("client_config.yaml").exists() {
-        figment = figment.merge(figment::providers::Yaml::file("client_config.yaml"));
-    }
-
-    if Path::new("local_client_config.yaml").exists() {
-        figment = figment.merge(figment::providers::Yaml::file("local_client_config.yaml"));
-    }
-
-    figment
+    Figment::new()
+        .merge(figment::providers::Yaml::file(
+            "/etc/kube-eye-export-server/client_config.yaml",
+        ))
+        .merge(figment::providers::Yaml::file("configs/client_config.yaml"))
 }
 
 pub async fn run() -> error::Result<()> {
@@ -54,17 +48,14 @@ pub async fn run() -> error::Result<()> {
     let client_config: ClientConfig = load_client_config().await?;
     tracing::info!("get client config: {:#?}", &client_config);
     let client_config = Arc::new(ArcSwap::from_pointee(client_config));
-    let path = vec![
-        PathBuf::from("client_config.yaml"),
-        PathBuf::from("local_client_config.yaml"),
-    ];
+    let path = PathBuf::from("configs");
     spawn_config_watcher(path, Arc::clone(&client_config)).await?;
     let server = server::Server::new(config.server, client_config);
     server.run(config.typst).await
 }
 
 pub async fn spawn_config_watcher(
-    path: Vec<PathBuf>,
+    path: PathBuf,
     client_config: Arc<ArcSwap<ClientConfig>>,
 ) -> error::Result<()> {
     tokio::spawn(async move {
@@ -77,17 +68,15 @@ pub async fn spawn_config_watcher(
         })
         .context(WatchFileSnafu)?;
 
-        for path in &path {
-            if path.exists() {
-                watcher
-                    .watch(path.as_path(), notify::RecursiveMode::NonRecursive)
-                    .context(WatchFileSnafu)?;
-            } else {
-                tracing::warn!(
-                    "skip watching missing client config file: {}",
-                    path.display()
-                );
-            }
+        if path.exists() {
+            watcher
+                .watch(path.as_path(), notify::RecursiveMode::NonRecursive)
+                .context(WatchFileSnafu)?;
+        } else {
+            tracing::warn!(
+                "skip watching missing client config file or dir: {}",
+                path.display()
+            );
         }
 
         while let Some(event) = rx.recv().await {
