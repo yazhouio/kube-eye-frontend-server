@@ -32,4 +32,5 @@ target/
 /configs/Config.toml
 /configs/client_config.yaml
 /configs/local_client_config.yaml
+/Config.toml
 AGENTS.md

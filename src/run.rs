@@ -1,7 +1,4 @@
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{path::PathBuf, sync::Arc};
 
 use arc_swap::ArcSwap;
 use figment::{Figment, providers::Format};
@@ -21,6 +18,7 @@ async fn load_server_config() -> error::Result<Config> {
         .merge(figment::providers::Toml::file(
             "/etc/kube-eye-export-server/Config.toml",
         ))
+        .merge(figment::providers::Toml::file("Config.toml"))
         .merge(figment::providers::Toml::file("configs/Config.toml"))
         .merge(figment::providers::Env::prefixed("APP_"))
         .extract()
