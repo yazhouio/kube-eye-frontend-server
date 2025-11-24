@@ -39,6 +39,7 @@ fn client_config_figment() -> Figment {
             "/etc/kube-eye-export-server/client_config.yaml",
         ))
         .merge(figment::providers::Yaml::file("configs/client_config.yaml"))
+        .merge(figment::providers::Yaml::file("configs/local_client_config.yaml"))
 }
 
 pub async fn run() -> error::Result<()> {
