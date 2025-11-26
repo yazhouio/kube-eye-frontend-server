@@ -166,3 +166,98 @@ impl IntoResponse for Error {
         (status, body).into_response()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::http::StatusCode;
+
+    #[test]
+    fn test_error_display_missing_auth() {
+        let error = Error::MissingAuth;
+        assert_eq!(error.to_string(), "Missing Authorization");
+    }
+
+    #[test]
+    fn test_error_display_invalid_token() {
+        let error = Error::InvalidToken;
+        assert_eq!(error.to_string(), "Invalid Token");
+    }
+
+    #[test]
+    fn test_error_display_bad_request() {
+        let error = Error::BadRequest {
+            message: "Invalid parameter".to_string(),
+        };
+        assert_eq!(error.to_string(), "Bad request: Invalid parameter");
+    }
+
+    #[test]
+    fn test_error_display_invalid_input() {
+        let error = Error::InvalidInput {
+            reason: "Theme not found".to_string(),
+        };
+        assert_eq!(error.to_string(), "Invalid input: Theme not found");
+    }
+
+    #[test]
+    fn test_error_display_typst_pdf() {
+        let error = Error::TypstPdf {
+            message: "Compilation failed".to_string(),
+        };
+        assert_eq!(error.to_string(), "Failed to generate pdf:Compilation failed");
+    }
+
+    #[test]
+    fn test_error_into_response_missing_auth() {
+        let error = Error::MissingAuth;
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[test]
+    fn test_error_into_response_invalid_token() {
+        let error = Error::InvalidToken;
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[test]
+    fn test_error_into_response_bad_request() {
+        let error = Error::BadRequest {
+            message: "test".to_string(),
+        };
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    #[test]
+    fn test_error_into_response_typst_pdf() {
+        let error = Error::TypstPdf {
+            message: "test".to_string(),
+        };
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    #[test]
+    fn test_error_response_serialization() {
+        let error_response = ErrorResponse {
+            code: 1001,
+            message: "Test error".to_string(),
+        };
+        let json = serde_json::to_string(&error_response).unwrap();
+        assert!(json.contains("1001"));
+        assert!(json.contains("Test error"));
+    }
+
+    #[test]
+    fn test_from_color_eyre_report() {
+        let report = color_eyre::eyre::eyre!("Test error");
+        let error: Error = report.into();
+        match error {
+            Error::Internal { .. } => (),
+            _ => panic!("Expected Internal error"),
+        }
+    }
+}
